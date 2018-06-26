@@ -13,10 +13,16 @@ try:
 except:
 	print('RPi library not found.  We\'re probably on a dev machine.  Moving on...')
 
+import litrpc
+
 default_config = {
 	'pin_num': -1,
 	'pin_high_time': 1,
-	'vend_cost_sat': 1000
+	'unit_cost_sat': 1000,
+	'coin_type_id': 1, # test btc
+	'lit_ip': '127.0.0.1',
+	'lit_port': '8001', # FIXME I don't think this is right.
+	'pool_rate': 5
 }
 
 def get_cfg_path():
@@ -44,10 +50,47 @@ def load_config():
 		with open(cfgpath, 'r') as f:
 			return json.loads(f.read())
 
+conn = None
+
+def check_deposit(cointype):
+	bals = conn.balance()
+	sum = 0
+	for b in bals:
+		if b['CoinType'] == cointype:
+			sum += b['ChanTotal'] # I'm not sure how this works, can it return dupes?
+	return sum
+
 def main(cfg):
 	if cfg['pin_num'] == -1:
 		print('You need to configure me first.  Come back later.')
 		sys.exit(1)
+
+	# Set up the connection and connect.
+	print('Connecting to lit at', cfg['lit_ip'], 'on port', cfg['lit_port'])
+	global conn
+	conn = litrpc.LitConnection(cfg['lit_ip'], cfg['lit_port'])
+	conn.connect()
+	print('Connected!')
+
+	# Then just enter the main loop.
+	print('Waiting for payment...')
+	last_bal = -1
+	while True:
+		bal = check_deposit(cfg['coin_type_id'])
+		diff = 0
+		if last_bal != -1:
+			diff = bal - last_bal
+		last_bal = bal
+		if diff != 0:
+			units_to_insert = diff / cfg['unit_cost_sat']
+			extra = diff % cfg['unit_cost_sat']
+			print('Balance is now', bal, 'got a spend of', diff, 'worth', units_to_insert, 'with an extra', extra, 'left over')
+			if gpio != None:
+				# TODO Set this up.
+				pass
+			else:
+				print('Not running on RPi, doing nothing!')
+		time.sleep(cfg['poll_rate'])
 
 if __name__ == '__main__':
 	main(load_config())
