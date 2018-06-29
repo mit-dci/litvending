@@ -65,6 +65,11 @@ def main(cfg):
 		print('You need to configure me first.  Come back later.')
 		sys.exit(1)
 
+	# Set up the GPIO pins.
+	gpio.setmode(gpio.BOARD)
+	gpio.setwarngings(True);
+	gpio.setup(cfg['pin_num'], gpio.OUT)
+
 	# Set up the connection and connect.
 	print('Connecting to lit at', cfg['lit_ip'], 'on port', cfg['lit_port'])
 	global conn
@@ -86,8 +91,12 @@ def main(cfg):
 			extra = diff % cfg['unit_cost_sat']
 			print('Balance is now', bal, 'got a spend of', diff, 'worth', units_to_insert, 'with an extra', extra, 'left over')
 			if gpio != None:
-				# TODO Set this up.
-				pass
+
+				# Just turn it on, wait a bit, and turn it off.
+				gpio.output(cfg['pin_num'], gpio.HIGH)
+				time.sleep(cfg['pin_high_time'])
+				gpio.output(cfg['pin_num'], gpio.LOW)
+
 			else:
 				print('Not running on RPi, doing nothing!')
 		time.sleep(cfg['poll_rate'])
