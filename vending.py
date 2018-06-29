@@ -64,4 +64,4 @@ def main(cfg):
 		time.sleep(cfg['poll_rate'])
 
 if __name__ == '__main__':
-	main(load_config())
+	main(lvconfig.load_config())
