@@ -12,10 +12,28 @@ import lvconfig
 
 cfg = lvconfig.load_config()
 
+trigger_pin = cfg['trigger_pin_num']
+reset_pin = cfg['reset_pin_num']
+sleeping = cfg['pin_high_time']
+
 try:
+	# GPIO init.
+	gpio.setmode(gpio.BOARD)
+	gpio.setwarngings(True);
+
+	# First reset the Arduino.
+	gpio.output(reset_pin, gpio.HIGH)
+	time.sleep(sleeping)
+	gpio.output(reset_pin, gpio.LOW)
+	time.sleep(sleeping)
+
+	# Wait a bit for it to finish initing.  (Probably more than it needs.)
+	time.sleep(1000)
+
     # Just turn it on, wait a bit, and turn it off.
-    gpio.output(cfg['pin_num'], gpio.HIGH)
-    time.sleep(cfg['pin_high_time'])
-    gpio.output(cfg['pin_num'], gpio.LOW)
+    gpio.output(trigger_pin, gpio.HIGH)
+    time.sleep(sleeping)
+    gpio.output(trigger_pin, gpio.LOW)
+	time.sleep(sleeping)
 except:
     print('Error sending GPIO signals.  You probably did something horribly wrong.')

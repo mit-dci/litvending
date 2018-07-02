@@ -4,7 +4,8 @@ import os.path as paths
 import json
 
 default_config = {
-	'pin_num': -1,
+	'trigger_pin_num': -1,
+	'reset_pin_num': -1,
 	'pin_high_time': 250,
     'deposit_delay_time': 2000,
 	'unit_cost_sat': 1000,

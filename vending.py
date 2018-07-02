@@ -25,10 +25,23 @@ def main(cfg):
 		print('You need to configure me first.  Come back later.')
 		sys.exit(1)
 
+	# Find important commonly-used variables.
+	reset_pin = cfg['reset_pin_num']
+	trigger_pin = cfg['trigger_pin_num']
+	sleep_time = cfg['pin_high_time']
+	deposit_delay = cfg['deposit_delay_time']
+
 	# Set up the GPIO pins.
 	gpio.setmode(gpio.BOARD)
 	gpio.setwarngings(True);
-	gpio.setup(cfg['pin_num'], gpio.OUT)
+	gpio.setup(reset_pin_num, gpio.OUT)
+	gpio.setup(trigger_pin, gpio.OUT)
+
+	# First reset the Arduino.
+	gpio.output(reset_pin, gpio.HIGH)
+	time.sleep(sleeping)
+	gpio.output(reset_pin, gpio.LOW)
+	time.sleep(sleeping)
 
 	# Set up the connection and connect.
 	print('Connecting to lit at', cfg['lit_ip'], 'on port', cfg['lit_port'])
@@ -54,10 +67,10 @@ def main(cfg):
 
 				for i in range(units_to_insert):
 					# Just turn it on, wait a bit, and turn it off.
-					gpio.output(cfg['pin_num'], gpio.HIGH)
-					time.sleep(cfg['pin_high_time'])
-					gpio.output(cfg['pin_num'], gpio.LOW)
-					time.sleep(cfg['deposit_delay_time'])
+					gpio.output(trigger_pin, gpio.HIGH)
+					time.sleep(sleep_time)
+					gpio.output(trigger_pin, gpio.LOW)
+					time.sleep(deposit_delay)
 
 			else:
 				print('Not running on RPi, doing nothing!')
