@@ -7,7 +7,7 @@ default_config = {
 	'trigger_pin_num': -1,
 	'reset_pin_num': -1,
 	'pin_high_time': 250,
-    'deposit_delay_time': 2000,
+	'deposit_delay_time': 2000,
 	'unit_cost_sat': 1000,
 	'coin_type_id': 1, # test btc
 	'lit_ip': '127.0.0.1',
