@@ -10,7 +10,9 @@ import json
 import logging
 import random
 import time
-import websocket  # `pip install websocket-client`
+
+import asyncio
+import websockets  # `pip install websockets
 
 logger = logging.getLogger("litrpc")
 
@@ -23,10 +25,10 @@ class LitConnection():
     def connect(self):
         """Connect to the node. Continue trying for 10 seconds"""
         logger.debug("Opening RPC connection to litnode %s:%s" % (self.ip, self.port))
-        self.ws = websocket.WebSocket()
         for _ in range(50):
             try:
-                self.ws.connect("ws://%s:%s/ws" % (self.ip, self.port))
+                s = asyncio.get_event_loop().run_until_complete(websockets.connect("ws://%s:%s/ws" % (self.ip, self.port)))
+                self.ws = s
             except ConnectionRefusedError:
                 # lit is not ready to accept connections yet
                 time.sleep(0.25)
@@ -38,14 +40,18 @@ class LitConnection():
     def send_message(self, method, params):
         """Sends a websocket message to the lit node"""
         logger.debug("Sending rpc message to %s:%s %s(%s)" % (self.ip, self.port, method, str(params)))
-        self.ws.send(json.dumps({"method": "LitRPC.%s" % method,
+        el = asyncio.get_event_loop();
+        print('foo')
+        el.run_until_complete(self.ws.send(json.dumps({"method": "LitRPC.%s" % method,
                                  "params": [params],
                                  "jsonrpc": "2.0",
-                                 "id": str(self.msg_id)}))
+                                 "id": str(self.msg_id)})))
 
         self.msg_id = self.msg_id + 1 % 10000
 
-        resp = json.loads(self.ws.recv())
+        print('bar')
+        resp = json.loads(el.run_until_complete(self.ws.recv()))
+        print('baz')
         logger.debug("Received rpc response from %s:%s method: %s Response: %s." % (self.ip, self.port, method, str(resp)))
         return resp
 

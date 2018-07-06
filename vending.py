@@ -21,7 +21,7 @@ def check_deposit(cointype):
 	return sum
 
 def main(cfg):
-	if cfg['pin_num'] == -1:
+	if cfg['trigger_pin_num'] == -1:
 		print('You need to configure me first.  Come back later.')
 		sys.exit(1)
 
@@ -31,9 +31,10 @@ def main(cfg):
 	deposit_delay = cfg['deposit_delay_time']
 
 	# Set up the GPIO pins.
-	gpio.setmode(gpio.BOARD)
-	gpio.setwarnings(False)
-	gpio.setup(trigger_pin, gpio.OUT)
+	if gpio != None:
+		gpio.setmode(gpio.BOARD)
+		gpio.setwarnings(False)
+		gpio.setup(trigger_pin, gpio.OUT)
 
 	# Set up the connection and connect.
 	print('Connecting to lit at', cfg['lit_ip'], 'on port', cfg['lit_port'])
