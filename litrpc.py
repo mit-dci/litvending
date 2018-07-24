@@ -11,49 +11,41 @@ import logging
 import random
 import time
 
-import asyncio
-import websockets  # `pip install websockets
+import requests # pip3 install requests
 
 logger = logging.getLogger("litrpc")
+
+max_id = 10000
 
 class LitConnection():
     """A class representing a connection to a lit node."""
     def __init__(self, ip, port):
         self.ip = ip
         self.port = port
-
-    def connect(self):
-        """Connect to the node. Continue trying for 10 seconds"""
-        logger.debug("Opening RPC connection to litnode %s:%s" % (self.ip, self.port))
-        for _ in range(50):
-            try:
-                s = asyncio.get_event_loop().run_until_complete(websockets.connect("ws://%s:%s/ws" % (self.ip, self.port)))
-                self.ws = s
-            except ConnectionRefusedError:
-                # lit is not ready to accept connections yet
-                time.sleep(0.25)
-            else:
-                # No exception - we're connected!
-                break
-        self.msg_id = random.randint(0, 9999)
+        self.msg_id = random.randint(0, max_id)
 
     def send_message(self, method, params):
-        """Sends a websocket message to the lit node"""
+        """Sends a POST message to the lit node"""
         logger.debug("Sending rpc message to %s:%s %s(%s)" % (self.ip, self.port, method, str(params)))
-        el = asyncio.get_event_loop();
-        print('foo')
-        el.run_until_complete(self.ws.send(json.dumps({"method": "LitRPC.%s" % method,
-                                 "params": [params],
-                                 "jsonrpc": "2.0",
-                                 "id": str(self.msg_id)})))
 
-        self.msg_id = self.msg_id + 1 % 10000
+        jsonreq = {
+            'method': "LitRPC.%s" % method,
+            'params': [params],
+            'jsonrpc': '2.0',
+            'id': self.msg_id
+        }
+        self.msg_id = (self.msg_id + 1) % max_id
 
-        print('bar')
-        resp = json.loads(el.run_until_complete(self.ws.recv()))
-        print('baz')
+        req = requests.post('http://{}:{}/oneoff' % (self.ip, self.port), json=jsonreq)
         logger.debug("Received rpc response from %s:%s method: %s Response: %s." % (self.ip, self.port, method, str(resp)))
-        return resp
+        if req.status_code == 200:
+            print('foo')
+            resp = req.json()['response']
+            return resp
+        else:
+            logger.warning('rpc call not OK: {}' % req.status_code)
+            print('bar')
+            return req.json()['error']
 
     def __getattr__(self, name):
         """Dispatches any unrecognised messages to the websocket connection"""
