@@ -17,7 +17,7 @@ logger = logging.getLogger("litrpc")
 
 max_id = 10000
 
-class LitConnection():
+class LitClient():
     """A class representing a connection to a lit node."""
     def __init__(self, ip, port):
         self.ip = ip
@@ -26,7 +26,7 @@ class LitConnection():
 
     def send_message(self, method, params):
         """Sends a POST message to the lit node"""
-        logger.debug("Sending rpc message to %s:%s %s(%s)" % (self.ip, self.port, method, str(params)))
+        logger.debug("Sending rpc message to %s:%s %s(%s)".format(self.ip, self.port, method, str(params)))
 
         jsonreq = {
             'method': "LitRPC.%s" % method,
@@ -36,15 +36,13 @@ class LitConnection():
         }
         self.msg_id = (self.msg_id + 1) % max_id
 
-        req = requests.post('http://{}:{}/oneoff' % (self.ip, self.port), json=jsonreq)
-        logger.debug("Received rpc response from %s:%s method: %s Response: %s." % (self.ip, self.port, method, str(resp)))
+        req = requests.post('http://{}:{}/oneoff'.format(self.ip, self.port), json=jsonreq)
         if req.status_code == 200:
-            print('foo')
-            resp = req.json()['response']
+            resp = req.json()['result']
+            logger.debug("Received rpc response from %s:%s method: %s Response: %s." % (self.ip, self.port, method, str(resp)))
             return resp
         else:
-            logger.warning('rpc call not OK: {}' % req.status_code)
-            print('bar')
+            logger.warning('rpc call not OK: {}'.format(req.status_code))
             return req.json()['error']
 
     def __getattr__(self, name):
@@ -59,4 +57,4 @@ class LitConnection():
 
     def balance(self):
         """Get wallit balance"""
-        return self.Bal()
+        return self.Balance()

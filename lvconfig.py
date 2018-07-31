@@ -11,7 +11,7 @@ default_config = {
 	'coin_type_id': 1, # test btc
 	'lit_ip': '127.0.0.1',
 	'lit_port': '8001', # FIXME I don't think this is right.
-	'pool_rate': 5
+	'poll_rate': 5
 }
 
 def get_cfg_path():

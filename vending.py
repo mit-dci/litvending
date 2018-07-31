@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import os
+import time
 import sys
 
 gpio = None
@@ -13,7 +15,7 @@ import lvconfig
 import litrpc
 
 def check_deposit(cointype):
-	bals = conn.balance()
+	bals = conn.balance()['Balances']
 	sum = 0
 	for b in bals:
 		if b['CoinType'] == cointype:
@@ -39,9 +41,8 @@ def main(cfg):
 	# Set up the connection and connect.
 	print('Connecting to lit at', cfg['lit_ip'], 'on port', cfg['lit_port'])
 	global conn
-	conn = litrpc.LitConnection(cfg['lit_ip'], cfg['lit_port'])
-	conn.connect()
-	print('Connected!')
+	conn = litrpc.LitClient(cfg['lit_ip'], cfg['lit_port'])
+	print('Set up client.')
 
 	# Then just enter the main loop.
 	print('Waiting for payment...')
@@ -67,6 +68,8 @@ def main(cfg):
 
 			else:
 				print('Not running on RPi, doing nothing!')
+		else:
+			print('No payment')
 		time.sleep(cfg['poll_rate'])
 
 if __name__ == '__main__':
