@@ -18,7 +18,6 @@ sleeping = cfg['pin_high_time']
 
 # Debug
 print('Trigger pin is', trigger_pin)
-print('Reset pin is', reset_pin)
 
 # GPIO init.
 gpio.setmode(gpio.BOARD)
