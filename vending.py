@@ -59,12 +59,13 @@ def main(cfg):
 			bal = check_deposit(ty)
 			if last_bal[ty] != -1:
 				diff = bal - last_bal[ty]
+				if diff <= 0: # when we withdraw it would break everything
+					continue
 				unit_cost = cfg['unit_costs'][ty]
 				units = int(diff // unit_cost)
 				extra = diff - units * unit_cost
 				to_insert += units
-				if diff != 0:
-					print('Balance for', ty, 'is now', bal, ', got a spend of', diff, 'sat worth', units, 'units with an extra', extra, 'sat left over')
+				print('Balance for', ty, 'is now', bal, ', got a spend of', diff, 'sat worth', units, 'units with an extra', extra, 'sat left over')
 			last_bal[ty] = bal
 
 		# Then send that many quarters.
