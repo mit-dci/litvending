@@ -14,12 +14,14 @@ except:
 import lvconfig
 import litrpc
 
+# This could be more efficient, we're making a lot more requests than we need to.
 def check_deposit(cointype):
 	bals = conn.balance()['Balances']
 	sum = 0
 	for b in bals:
 		if b['CoinType'] == int(cointype):
-			sum += b['ChanTotal'] + b['AdrTotal']# I'm not sure how this works, can it return dupes?
+			# I'm not sure how this works, can it return dupes?
+			sum += b['ChanTotal'] + b['TxoTotal']
 	return sum
 
 def main(cfg):
