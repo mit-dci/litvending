@@ -54,7 +54,7 @@ def main(cfg):
 			diff = bal - last_bal
 		last_bal = bal
 		if diff != 0:
-			units_to_insert = diff / cfg['unit_cost_sat']
+			units_to_insert = int(diff / cfg['unit_cost_sat'])
 			extra = diff % cfg['unit_cost_sat']
 			print('Balance is now', bal, 'got a spend of', diff, 'worth', units_to_insert, 'with an extra', extra, 'left over')
 			if gpio != None:
