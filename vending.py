@@ -63,7 +63,8 @@ def main(cfg):
 				units = int(diff // unit_cost)
 				extra = diff - units * unit_cost
 				to_insert += units
-				print('Balance is now', bal, 'got a spend of', diff, 'worth', units, 'with an extra', extra, 'left over')
+				if diff != 0:
+					print('Balance for', ty, 'is now', bal, ', got a spend of', diff, 'sat worth', units, 'units with an extra', extra, 'sat left over')
 			last_bal[ty] = bal
 
 		# Then send that many quarters.
