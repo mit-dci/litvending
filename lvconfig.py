@@ -5,12 +5,14 @@ import json
 
 default_config = {
 	'trigger_pin_num': -1,
-	'pin_high_time': 0.25,
-	'deposit_delay_time': 2.0,
-	'unit_cost_sat': 1000,
-	'coin_type_id': 1, # test btc
+	'pin_high_time': 0.1,
+	'deposit_delay_time': 0.75,
+	'unit_costs': {
+		'1': 30000 # very very high, like $2.25 at the time of writing. 9:1 loss for them
+	},
+	'coin_type_ids': [ '1' ], # bitcoin testnet3
 	'lit_ip': '127.0.0.1',
-	'lit_port': '8001', # FIXME I don't think this is right.
+	'lit_port': '8001',
 	'poll_rate': 5
 }
 
@@ -38,5 +40,3 @@ def load_config():
 		# This is easy, just load it.
 		with open(cfgpath, 'r') as f:
 			return json.loads(f.read())
-
-conn = None

@@ -18,8 +18,8 @@ def check_deposit(cointype):
 	bals = conn.balance()['Balances']
 	sum = 0
 	for b in bals:
-		if b['CoinType'] == cointype:
-			sum += b['ChanTotal'] # I'm not sure how this works, can it return dupes?
+		if b['CoinType'] == int(cointype):
+			sum += b['ChanTotal'] + b['AdrTotal']# I'm not sure how this works, can it return dupes?
 	return sum
 
 def main(cfg):
@@ -46,25 +46,37 @@ def main(cfg):
 
 	# Then just enter the main loop.
 	print('Waiting for payment...')
-	last_bal = -1
+	last_bal = {}
+	for ty in cfg['coin_type_ids']:
+		last_bal[ty] = -1
 	while True:
-		bal = check_deposit(cfg['coin_type_id'])
-		diff = 0
-		if last_bal != -1:
-			diff = bal - last_bal
-		last_bal = bal
-		if diff != 0:
-			units_to_insert = int(diff / cfg['unit_cost_sat'])
-			extra = diff % cfg['unit_cost_sat']
-			print('Balance is now', bal, 'got a spend of', diff, 'worth', units_to_insert, 'with an extra', extra, 'left over')
+
+		# First figure out how much might have been sent to us.
+		to_insert = 0
+		for ty in cfg['coin_type_ids']:
+			bal = check_deposit(ty)
+			if last_bal[ty] != -1:
+				diff = bal - last_bal[ty]
+				unit_cost = cfg['unit_costs'][ty]
+				units = int(diff // unit_cost)
+				extra = diff - units * unit_cost
+				to_insert += units
+				print('Balance is now', bal, 'got a spend of', diff, 'worth', units, 'with an extra', extra, 'left over')
+			last_bal[ty] = bal
+
+		# Then send that many quarters.
+		if to_insert != 0:
+			print('Total to insert:', to_insert)
 			if gpio != None:
 
-				for i in range(units_to_insert):
+				for i in range(to_insert):
 					# Just turn it on, wait a bit, and turn it off.
 					gpio.output(trigger_pin, gpio.HIGH)
 					time.sleep(sleep_time)
 					gpio.output(trigger_pin, gpio.LOW)
 					time.sleep(deposit_delay)
+
+				print('Done')
 
 			else:
 				print('Not running on RPi, doing nothing!')
