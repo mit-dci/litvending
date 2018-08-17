@@ -20,7 +20,7 @@ def get_cfg_path():
 	if os.getenv('LITVENDING_CONFIG') is not None:
 		return paths.expanduser(os.getenv('LITVENDING_CONFIG'))
 	else:
-		return paths.join(os.getenv('HOME'), '.litvending', 'config.json')
+		return paths.join(os.getenv('HOME'), '.config', 'litvending', 'config.json')
 
 def load_config():
 
