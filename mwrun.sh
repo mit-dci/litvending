@@ -1,8 +1,8 @@
 #!/bin/bash
 
-set -ex
-
 dcidemoaddr=dcidemo.media.mit.edu
+
+set -ex
 
 if [ ! -e lit ]; then
 	git clone \
@@ -32,7 +32,6 @@ $litpath -v --unauthrpc \
 	--dusd $dcidemoaddr:26999 &
 
 litpid=$!
-
 
 LITVENDING_CONFIG=config.json ./vending.py
 kill $litpid
