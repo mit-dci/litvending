@@ -35,7 +35,7 @@ def main(cfg):
 	deposit_delay = cfg['deposit_delay_time']
 
 	# Set up the GPIO pins.
-	if gpio != None:
+	if gpio is not None:
 		gpio.setmode(gpio.BOARD)
 		gpio.setwarnings(False)
 		gpio.setup(trigger_pin, gpio.OUT)
@@ -71,7 +71,7 @@ def main(cfg):
 		# Then send that many quarters.
 		if to_insert != 0:
 			print('Total to insert:', to_insert)
-			if gpio != None:
+			if gpio is not None:
 
 				for i in range(to_insert):
 					# Just turn it on, wait a bit, and turn it off.
