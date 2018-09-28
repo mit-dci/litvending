@@ -1,19 +1,14 @@
 #!/bin/bash
 
 dcidemoaddr=dcidemo.media.mit.edu
+latestarcurl='http://hubris.media.mit.edu:8080/job/lit-mw/job/memberweekdemo/lastSuccessfulBuild/artifact/build/_releasedir/lit-161aa3d-linux-arm.tar.gz'
+arcname=build.tar.gz
 
 set -ex
 
-if [ ! -e lit ]; then
-	git clone \
-		--single-branch \
-		-b memberweekdemo \
-		--depth=1 \
-		https://github.com/gertjaap/lit.git
-fi
-
-pushd lit > /dev/null
-make lit lit-af
+wget $latestarcurl -O $arcname
+tar -xvzf $arcname
+pushd $(ls -d lit-*/) > /dev/null
 litpath=$(realpath lit)
 popd > /dev/null
 
