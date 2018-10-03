@@ -3,16 +3,18 @@
 dcidemoaddr=dcidemo.media.mit.edu
 latestarcurl='http://hubris.media.mit.edu:8080/job/lit-mw/job/memberweekdemo/lastSuccessfulBuild/artifact/build/_releasedir/*zip*/_releasedir.zip'
 arcname=releases.zip
+venddelay=5
 
 set -ex
 
 # Do a bunch of fenagling to get things right.
-mkdir extract
+mkdir -p extract
 pushd extract > /dev/null
 rm -rf ./*
-wget $latestarcurl -O $arcname
+wget -O $arcname $latestarcurl # this complains about wildcards, not a lot I can do about that
 unzip releases.zip
-tar -xvzf lit-*-linux-arm.tar.gz
+arc=$(find . -name 'lit-*-linux-arm.tar.gz')
+tar -xvzf $arc
 pushd $(ls -d lit-*/) > /dev/null
 litpath=$(realpath lit)
 popd > /dev/null
@@ -25,6 +27,9 @@ if [ ! -e $pkpath ]; then
 	cat $pkpath
 fi
 
+# If something fails we don't want to totally fail everything anymore.
+set +e
+
 $litpath -v --unauthrpc \
 	--dir=litdata \
 	--tn3 0 \
@@ -34,5 +39,6 @@ $litpath -v --unauthrpc \
 
 litpid=$!
 
+sleep $venddelay # need this because it takes lit some time to startup
 LITVENDING_CONFIG=config.json ./vending.py
 kill $litpid
