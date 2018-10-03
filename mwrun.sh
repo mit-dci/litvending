@@ -25,6 +25,7 @@ if [ ! -e $pkpath ]; then
 	mkdir -p $(dirname $pkpath)
 	dd if=/dev/urandom bs=32 count=1 2> /dev/null | hexdump -e '32/1 "%02x" "\n"' > $pkpath
 	cat $pkpath
+	echo '{}' > litdata/rates.json
 fi
 
 # If something fails we don't want to totally fail everything anymore.
