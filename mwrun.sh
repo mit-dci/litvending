@@ -1,15 +1,21 @@
 #!/bin/bash
 
 dcidemoaddr=dcidemo.media.mit.edu
-latestarcurl='http://hubris.media.mit.edu:8080/job/lit-mw/job/memberweekdemo/lastSuccessfulBuild/artifact/build/_releasedir/lit-161aa3d-linux-arm.tar.gz'
-arcname=build.tar.gz
+latestarcurl='http://hubris.media.mit.edu:8080/job/lit-mw/job/memberweekdemo/lastSuccessfulBuild/artifact/build/_releasedir/*zip*/_releasedir.zip'
+arcname=releases.zip
 
 set -ex
 
+# Do a bunch of fenagling to get things right.
+mkdir extract
+rm -rf ./*
+pushd extract > /dev/null
 wget $latestarcurl -O $arcname
-tar -xvzf $arcname
+unzip releases.zip
+tar -xvzf lit-*-linux-arm.tar.gz
 pushd $(ls -d lit-*/) > /dev/null
 litpath=$(realpath lit)
+popd > /dev/null
 popd > /dev/null
 
 pkpath=litdata/privkey.hex
