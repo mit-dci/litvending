@@ -8,8 +8,8 @@ set -ex
 
 # Do a bunch of fenagling to get things right.
 mkdir extract
-rm -rf ./*
 pushd extract > /dev/null
+rm -rf ./*
 wget $latestarcurl -O $arcname
 unzip releases.zip
 tar -xvzf lit-*-linux-arm.tar.gz
